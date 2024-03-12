@@ -1,0 +1,188 @@
+1.select * from Crime where status="open";
++---------+--------------+--------------+------------------------+--------------------------------------+--------+
+| CrimeID | IncidentType | IncidentDate | Location               | Description                          | Status |
++---------+--------------+--------------+------------------------+--------------------------------------+--------+
+|       1 | Robbery      | 2023-09-15   | 123 Main St, Cityville | Armed robbery at a convenience store | Open   |
+|       4 | Robbery      | 2024-01-17   | 345 Main St, bangville | Armed robbery at a stationary store  | Open   |
++---------+--------------+--------------+------------------------+--------------------------------------+--------+
+
+2. select count(*) as Total_Incidents from Crime;
++-----------------+
+| Total_Incidents |
++-----------------+
+|               5 |
++-----------------+
+
+3. select distinct IncidentType from crime;
++--------------+
+| IncidentType |
++--------------+
+| Robbery      |
+| Homicide     |
+| Theft        |
++--------------+
+
+4.select * from crime where IncidentDate between '2023-09-01' AND '2023-09-10';
++---------+--------------+--------------+-------------------------+--------------------------------+--------+
+| CrimeID | IncidentType | IncidentDate | Location                | Description                    | Status |
++---------+--------------+--------------+-------------------------+--------------------------------+--------+
+|       3 | Theft        | 2023-09-10   | 789 Oak St, Villagetown | Shoplifting incident at a mall | Closed |
++---------+--------------+--------------+-------------------------+--------------------------------+--------+
+
+5. select s.Name,s.Age from suspect s join crime c on s.CrimeID=c.CrimeID order by s.Age desc;
++-----------+------+
+| Name      | Age  |
++-----------+------+
+| Unknown   |   50 |
+| Robber 2  |   49 |
+| Suspect 1 |   30 |
+| Robber 1  |   23 |
+| Robber 1  | NULL |
+| Robber 1  | NULL |
++-----------+------+
+
+6. select Avg(s.Age) from suspect s join crime c on s.CrimeID=c.CrimeID ;
++------------+
+| Avg(s.Age) |
++------------+
+|    38.0000 |
++------------+
+
+7. select IncidentType, Count(*) As IncidentCount from Crime  where status='Open' group by IncidentType;
++--------------+---------------+
+| IncidentType | IncidentCount |
++--------------+---------------+
+| Robbery      |             2 |
++--------------+---------------+
+
+8. select Name from (select Name from Victim union select Name from Suspect) as DoeNamePerson where Name like '%Doe%';
++----------+
+| Name     |
++----------+
+| John Doe |
++----------+
+
+9.select s.SuspectID, s.Name,s.Age from suspect s join crime c on s.CrimeID=c.CrimeID order by s.Age desc;
++-----------+-----------+------+
+| SuspectID | Name      | Age  |
++-----------+-----------+------+
+|         2 | Unknown   |   50 |
+|         4 | Robber 2  |   49 |
+|         3 | Suspect 1 |   30 |
+|         1 | Robber 1  |   23 |
+|         5 | Robber 1  | NULL |
+|         6 | Robber 1  | NULL |
++-----------+-----------+------+
+
+10. select c.IncidentType,s.Age from Crime c join Suspect s on c.CrimeID=s.CrimeID where s.Age between 30 AND 35;
++--------------+------+
+| IncidentType | Age  |
++--------------+------+
+| Theft        |   30 |
++--------------+------+
+
+11.select s.Name,c.IncidentType from suspect s join crime c on s.CrimeID=c.CrimeID where c.IncidentType="Robbery";
++----------+--------------+
+| Name     | IncidentType |
++----------+--------------+
+| Robber 1 | Robbery      |
+| Robber 1 | Robbery      |
+| Robber 1 | Robbery      |
+| Robber 2 | Robbery      |
++----------+--------------+
+
+12.select IncidentType from Crime where status='open' group by IncidentType having count(*)>1;
++--------------+
+| IncidentType |
++--------------+
+| Robbery      |
++--------------+
+
+13.select c.* from Crime c join Suspect s on c.CrimeID = s.CrimeID where s.Name in (select Name from Victim);
++---------+--------------+--------------+-------------------------+--------------------------------+--------+
+| CrimeID | IncidentType | IncidentDate | Location                | Description                    | Status |
++---------+--------------+--------------+-------------------------+--------------------------------+--------+
+|       3 | Theft        | 2023-09-10   | 789 Oak St, Villagetown | Shoplifting incident at a mall | Closed |
++---------+--------------+--------------+-------------------------+--------------------------------+--------+
+
+14. select c.*, v.Name as VictimName, s.Name as SuspectName from Crime c left join Victim v ON c.CrimeID = v.CrimeID left join Suspect s ON c.CrimeID = s.CrimeID;
++---------+--------------+--------------+-------------------------+--------------------------------------+---------------------+---------------+-------------+
+| CrimeID | IncidentType | IncidentDate | Location                | Description                          | Status              | VictimName    | SuspectName |
++---------+--------------+--------------+-------------------------+--------------------------------------+---------------------+---------------+-------------+
+|       1 | Robbery      | 2023-09-15   | 123 Main St, Cityville  | Armed robbery at a convenience store | Open                | John Doe      | Robber 1    |
+|       1 | Robbery      | 2023-09-15   | 123 Main St, Cityville  | Armed robbery at a convenience store | Open                | John Doe      | Robber 1    |
+|       1 | Robbery      | 2023-09-15   | 123 Main St, Cityville  | Armed robbery at a convenience store | Open                | John Doe      | Robber 1    |
+|       2 | Homicide     | 2023-09-20   | 456 Elm St, Townsville  | Investigation into a murder case     | Under Investigation | Jane Smith    |Unknown      |
+|       3 | Theft        | 2023-09-10   | 789 Oak St, Villagetown | Shoplifting incident at a mall       | Closed              | Alice Johnson | Suspect 1   |
+|       4 | Robbery      | 2024-01-17   | 345 Main St, bangville  | Armed robbery at a stationary store  | Open                | Suspect 1     | Robber 2    |
+|       5 | Homicide     | 2023-01-07   | 345 Main St, bangville  | Armed robbery at a grocery store     | Closed              | NULL          | NULL        |
++---------+--------------+--------------+-------------------------+--------------------------------------+---------------------+---------------+-------------+
+
+15.select c.IncidentType from Crime c join Suspect s on c.CrimeID = s.CrimeID join Victim v on c.CrimeID = v.CrimeID where s.Age > ALL(select v.Age from Victim v where v.CrimeID = c.CrimeID);
++--------------+
+| IncidentType |
++--------------+
+| Homicide     |
++--------------+
+
+16. select  Name
+    -> from Suspect
+    -> group by Name
+    -> having count(DISTINCT CrimeID) > 1;
+
+
++--------------+
+| Name         |
++--------------+
+| NULL         |
++--------------+
+
+
+
+17.select c.IncidentType from Crime c left join Suspect s on c.CrimeID = s.CrimeID where s.SuspectID is null;
++--------------+
+| IncidentType |
++--------------+
+| Homicide     |
++--------------+
+
+18.SELECT DISTINCT CrimeID
+    -> FROM Crime c1 WHERE IncidentType = 'Homicide'
+    ->    AND NOT EXISTS (
+    ->        SELECT 1
+    ->        FROM Crime c2  WHERE c2.CrimeID = c1.CrimeID
+    ->       AND c2.IncidentType <> 'Homicide'  )
+    ->   AND EXISTS (  SELECT 1
+    ->       FROM Crime c3
+    ->       WHERE c3.CrimeID = c1.CrimeID  AND c3.IncidentType = 'Robbery' );
+
++--------------+
+|CrimeID       |
++--------------+
+| Null         |
++--------------+
+
+19. SELECT c.IncidentType, s.SuspectID, s.Name FROM crime c LEFT JOIN Suspect s ON c.CrimeID = s.CrimeID ORDER BY c.CrimeID , s.SuspectID;
++--------------+-----------+-----------+
+| IncidentType | SuspectID | Name      |
++--------------+-----------+-----------+
+| Robbery      |         1 | Robber 1  |
+| Robbery      |         5 | Robber 1  |
+| Robbery      |         6 | Robber 1  |
+| Homicide     |         2 | Unknown   |
+| Theft        |         3 | Suspect 1 |
+| Robbery      |         4 | Robber 2  |
+| Homicide     |      NULL | NULL      |
++--------------+-----------+-----------+
+
+20.SELECT s.SuspectID, s.Name, c.IncidentType FROM Suspect s JOIN Crime c ON s.CrimeID = c.CrimeID WHERE c.IncidentType IN ('Robbery', 'Assault');
++-----------+----------+--------------+
+| SuspectID | Name     | IncidentType |
++-----------+----------+--------------+
+|         1 | Robber 1 | Robbery      |
+|         5 | Robber 1 | Robbery      |
+|         6 | Robber 1 | Robbery      |
+|         4 | Robber 2 | Robbery      |
++-----------+----------+--------------+
+
+
